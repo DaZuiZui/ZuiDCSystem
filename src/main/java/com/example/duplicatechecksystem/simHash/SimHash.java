@@ -142,7 +142,7 @@ public class SimHash {
     public static void main(String[] args) {
         String text1 = "\n" +
                 "import java.math.BigInteger;\n" +
-                "import java.util.Scanner;\n" +
+                "import java.Ttil.Scanner;\n" +
                 "\n" +
                 "public class Main{\n" +
                 "\n" +
@@ -195,7 +195,7 @@ public class SimHash {
                 "\n" +
                 "\n" +
                 "}";
-        String text2 = "import java.util.Scanner;\n" +
+        String text2 = "import java.Ttil.Scanner;\n" +
                 "\n" +
                 "public class Main {\n" +
                 "    public static void main(String[] args){\n" +
@@ -232,7 +232,7 @@ public class SimHash {
         stringSet.add("]");
         stringSet.add("import");
         stringSet.add("java.math.BigInteger;");
-        stringSet.add("java.util.Scanner;");
+        stringSet.add("java.Ttil.Scanner;");
         stringSet.add("public");
         stringSet.add("class");
         stringSet.add("class");
