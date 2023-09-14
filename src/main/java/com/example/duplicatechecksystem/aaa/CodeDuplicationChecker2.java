@@ -3,7 +3,7 @@ package com.example.duplicatechecksystem.aaa;
 import java.math.BigInteger;
 import java.util.*;
 
-public class CodeDuplicationChecker {
+public class CodeDuplicationChecker2 {
     public static String a = Ttil.a;
     public static String b = Ttil.b;
 
@@ -48,12 +48,16 @@ public class CodeDuplicationChecker {
         // 添加更多白名单条目...
     }
 
+
     public static void main(String[] args) {
         // 假设您有一批学生提交的代码，存放在一个列表中
         List<String> studentCodes = new ArrayList<>();
         studentCodes.add(a);
         studentCodes.add(b);
+        studentCodes.add(b);
 
+
+        // 检查每对学生代码的相似性，并输出结果
         int totalComparisons = 0;
         int similarPairs = 0;
 
@@ -64,6 +68,7 @@ public class CodeDuplicationChecker {
                 String code1 = studentCodes.get(i);
                 String code2 = studentCodes.get(j);
 
+                // 检查代码片段是否在白名单中
                 if (isWhitelisted(code1) || isWhitelisted(code2)) {
                     continue; // 在白名单中的代码片段不需要查重，跳过
                 }
@@ -82,28 +87,14 @@ public class CodeDuplicationChecker {
 
                 // 如果相似性超过阈值，认为存在查重
                 double threshold = 0.5; // 设置相似性阈值
-//                if (combinedSimilarity >= threshold) {
-                if(true){
+                if (combinedSimilarity >= threshold) {
                     similarPairs++;
+//                    System.out.println("存在代码查重：");
+//                    System.out.println("代码片段1：");
+//                    System.out.println(code1);
+//                    System.out.println("代码片段2：");
+//                    System.out.println(code2);
 
-                    // 新功能：查找相似内容及其位置
-                    List<SimilarityInfo> similarities = findSimilarContent(code1, code2);
-                    if (!similarities.isEmpty()) {
-                        System.out.println("存在代码查重：");
-                        System.out.println("代码片段1：");
-                        System.out.println(code1);
-                        System.out.println("代码片段2：");
-                        System.out.println(code2);
-                        for (SimilarityInfo info : similarities) {
-                            System.out.println("相似内容1: " + info.content1);
-                            System.out.println("起点位置1: " + info.startPosition1);
-                            System.out.println("终点位置1: " + info.endPosition1);
-                            System.out.println("相似内容2: " + info.content2);
-                            System.out.println("起点位置2: " + info.startPosition2);
-                            System.out.println("终点位置2: " + info.endPosition2);
-                            System.out.println("------------------------");
-                        }
-                    }
                 }
                 System.out.println("综合相似性：" + combinedSimilarity);
                 System.out.println("------------------------");
@@ -112,50 +103,7 @@ public class CodeDuplicationChecker {
 
         // 计算最终查重率
         double duplicationRate = (double) similarPairs / totalComparisons;
-        System.out.println("最终查重率：" + (duplicationRate == 0.0 ? "不涉及抄袭" : "可能涉及抄袭"));
-    }
-
-    // 以下是新功能的方法
-
-    // 查找相似内容及其位置
-    private static List<SimilarityInfo> findSimilarContent(String code1, String code2) {
-        List<SimilarityInfo> similarities = new ArrayList<>();
-
-        // 实现查找相似内容及其位置的逻辑
-        String[] words1 = code1.split("\\s+");
-        String[] words2 = code2.split("\\s+");
-        for (String word1 : words1) {
-            for (String word2 : words2) {
-                if (word1.equals(word2)) {
-                    int startPosition1 = code1.indexOf(word1);
-                    int endPosition1 = startPosition1 + word1.length() - 1;
-                    int startPosition2 = code2.indexOf(word2);
-                    int endPosition2 = startPosition2 + word2.length() - 1;
-                    similarities.add(new SimilarityInfo(word1, startPosition1, endPosition1, word2, startPosition2, endPosition2));
-                }
-            }
-        }
-
-        return similarities;
-    }
-
-    // Custom class to hold similarity information
-    static class SimilarityInfo {
-        String content1;
-        int startPosition1;
-        int endPosition1;
-        String content2;
-        int startPosition2;
-        int endPosition2;
-
-        SimilarityInfo(String content1, int startPosition1, int endPosition1, String content2, int startPosition2, int endPosition2) {
-            this.content1 = content1;
-            this.startPosition1 = startPosition1;
-            this.endPosition1 = endPosition1;
-            this.content2 = content2;
-            this.startPosition2 = startPosition2;
-            this.endPosition2 = endPosition2;
-        }
+        System.out.println("最终查重率：" + (duplicationRate == 0.0 ? "不涉及抄袭": "可能涉及抄袭"));
     }
 
     // 计算SimHash相似性的方法
@@ -173,6 +121,7 @@ public class CodeDuplicationChecker {
         // 设置SimHash的位数（根据需要调整）
         int bitCount = 64;
         int[] simHashArray = new int[bitCount];
+
         // 分词并计算每个词的哈希值
         String[] tokens = code.split("\\s+");
         Map<Integer, Integer> wordFrequencyMap = new HashMap<>();
@@ -246,6 +195,7 @@ public class CodeDuplicationChecker {
         return whitelist.contains(word);
     }
 
+
     // 计算编辑距离的方法
     private static int calculateEditDistance(String code1, String code2) {
         // 使用动态规划计算编辑距离
@@ -276,6 +226,7 @@ public class CodeDuplicationChecker {
         // 这个示例中，平均了三个相似性分数，您可以根据实际情况进行调整
         return (simHashSimilarity + jaccardSimilarity + (1.0 / (editDistance + 1))) / 3.0;
     }
-}
 
+
+}
 

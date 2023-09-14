@@ -1,9 +1,20 @@
-package com.example.duplicatechecksystem.aaa;
+package com.example.duplicatechecksystem.service.impl;
+
+import com.example.duplicatechecksystem.aaa.Ttil;
+import com.example.duplicatechecksystem.domain.vo.DuplicationCheckerVo;
+import com.example.duplicatechecksystem.domain.vo.ResponseVo;
+import com.example.duplicatechecksystem.domain.SimilarityInfo;
+import com.example.duplicatechecksystem.service.DuplicationCheckerCoreService;
+import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.*;
 
-public class CodeDuplicationChecker {
+/**
+ *
+ */
+@Service
+public class DuplicationCheckerCoreServiceImpl implements DuplicationCheckerCoreService {
     public static String a = Ttil.a;
     public static String b = Ttil.b;
 
@@ -48,11 +59,12 @@ public class CodeDuplicationChecker {
         // 添加更多白名单条目...
     }
 
-    public static void main(String[] args) {
+    public DuplicationCheckerVo run(String str1, String str2, Set<String> set) {
         // 假设您有一批学生提交的代码，存放在一个列表中
+        DuplicationCheckerVo duplicationCheckerVo = new DuplicationCheckerVo();
         List<String> studentCodes = new ArrayList<>();
-        studentCodes.add(a);
-        studentCodes.add(b);
+        studentCodes.add(str1);
+        studentCodes.add(str2);
 
         int totalComparisons = 0;
         int similarPairs = 0;
@@ -85,26 +97,31 @@ public class CodeDuplicationChecker {
 //                if (combinedSimilarity >= threshold) {
                 if(true){
                     similarPairs++;
-
                     // 新功能：查找相似内容及其位置
                     List<SimilarityInfo> similarities = findSimilarContent(code1, code2);
+                    duplicationCheckerVo.setSimilarities(similarities);
+
                     if (!similarities.isEmpty()) {
-                        System.out.println("存在代码查重：");
-                        System.out.println("代码片段1：");
-                        System.out.println(code1);
-                        System.out.println("代码片段2：");
-                        System.out.println(code2);
+//                        System.out.println("存在代码查重：");
+//                        System.out.println("代码片段1：");
+//                        System.out.println(code1);
+//                        System.out.println("代码片段2：");
+//                        System.out.println(code2);
                         for (SimilarityInfo info : similarities) {
-                            System.out.println("相似内容1: " + info.content1);
-                            System.out.println("起点位置1: " + info.startPosition1);
-                            System.out.println("终点位置1: " + info.endPosition1);
-                            System.out.println("相似内容2: " + info.content2);
-                            System.out.println("起点位置2: " + info.startPosition2);
-                            System.out.println("终点位置2: " + info.endPosition2);
+
+                            System.out.println("相似内容1: " + info.getContent1());
+                            System.out.println("起点位置1: " + info.getStartPosition1());
+                            System.out.println("终点位置1: " + info.getEndPosition1());
+                            System.out.println("相似内容2: " + info.getContent2());
+                            System.out.println("起点位置2: " + info.getStartPosition2());
+                            System.out.println("终点位置2: " + info.getEndPosition2());
                             System.out.println("------------------------");
                         }
+
                     }
                 }
+
+                duplicationCheckerVo.setCombinedSimilarity(combinedSimilarity);
                 System.out.println("综合相似性：" + combinedSimilarity);
                 System.out.println("------------------------");
             }
@@ -113,12 +130,13 @@ public class CodeDuplicationChecker {
         // 计算最终查重率
         double duplicationRate = (double) similarPairs / totalComparisons;
         System.out.println("最终查重率：" + (duplicationRate == 0.0 ? "不涉及抄袭" : "可能涉及抄袭"));
+        return duplicationCheckerVo;
     }
 
     // 以下是新功能的方法
 
     // 查找相似内容及其位置
-    private static List<SimilarityInfo> findSimilarContent(String code1, String code2) {
+    private  List<SimilarityInfo> findSimilarContent(String code1, String code2) {
         List<SimilarityInfo> similarities = new ArrayList<>();
 
         // 实现查找相似内容及其位置的逻辑
@@ -139,27 +157,8 @@ public class CodeDuplicationChecker {
         return similarities;
     }
 
-    // Custom class to hold similarity information
-    static class SimilarityInfo {
-        String content1;
-        int startPosition1;
-        int endPosition1;
-        String content2;
-        int startPosition2;
-        int endPosition2;
-
-        SimilarityInfo(String content1, int startPosition1, int endPosition1, String content2, int startPosition2, int endPosition2) {
-            this.content1 = content1;
-            this.startPosition1 = startPosition1;
-            this.endPosition1 = endPosition1;
-            this.content2 = content2;
-            this.startPosition2 = startPosition2;
-            this.endPosition2 = endPosition2;
-        }
-    }
-
     // 计算SimHash相似性的方法
-    private static double calculateSimHashSimilarity(String code1, String code2) {
+    private  double calculateSimHashSimilarity(String code1, String code2) {
         BigInteger simHash1 = calculateSimHash(code1);
         BigInteger simHash2 = calculateSimHash(code2);
 
@@ -169,7 +168,7 @@ public class CodeDuplicationChecker {
     }
 
     // 计算SimHash值
-    private static BigInteger calculateSimHash(String code) {
+    private  BigInteger calculateSimHash(String code) {
         // 设置SimHash的位数（根据需要调整）
         int bitCount = 64;
         int[] simHashArray = new int[bitCount];
@@ -203,19 +202,19 @@ public class CodeDuplicationChecker {
     }
 
     // 计算汉明距离
-    private static int calculateHammingDistance(BigInteger simHash1, BigInteger simHash2) {
+    private  int calculateHammingDistance(BigInteger simHash1, BigInteger simHash2) {
         BigInteger xor = simHash1.xor(simHash2);
         int hammingDistance = xor.bitCount();
         return hammingDistance;
     }
 
     // 计算相似性分数
-    private static double calculateSimilarityScore(int hammingDistance) {
+    private  double calculateSimilarityScore(int hammingDistance) {
         return 1.0 / (hammingDistance + 1);
     }
 
     // 计算Jaccard相似性的方法
-    private static double calculateJaccardSimilarity(String code1, String code2) {
+    private  double calculateJaccardSimilarity(String code1, String code2) {
         Set<String> words1 = new HashSet<>(Arrays.asList(code1.split("\\s+")));
         Set<String> words2 = new HashSet<>(Arrays.asList(code2.split("\\s+")));
 
@@ -242,12 +241,12 @@ public class CodeDuplicationChecker {
     }
 
     // 检查单词是否在白名单中
-    private static boolean isWhitelisted(String word) {
+    private  boolean isWhitelisted(String word) {
         return whitelist.contains(word);
     }
 
     // 计算编辑距离的方法
-    private static int calculateEditDistance(String code1, String code2) {
+    private  int calculateEditDistance(String code1, String code2) {
         // 使用动态规划计算编辑距离
         int m = code1.length();
         int n = code2.length();
@@ -271,11 +270,16 @@ public class CodeDuplicationChecker {
     }
 
     // 综合考虑相似性度量并根据需要进行权衡
-    private static double combineSimilarities(double simHashSimilarity, double jaccardSimilarity, int editDistance) {
+    private  double combineSimilarities(double simHashSimilarity, double jaccardSimilarity, int editDistance) {
         // 这里可以根据需要进行权衡不同相似性度量的贡献
         // 这个示例中，平均了三个相似性分数，您可以根据实际情况进行调整
         return (simHashSimilarity + jaccardSimilarity + (1.0 / (editDistance + 1))) / 3.0;
     }
+
+    @Override
+    public ResponseVo check(String str1, String str2,Set<String> set) {
+        DuplicationCheckerVo run = this.run(str1, str2, set);
+        System.err.println(run);
+        return null;
+    }
 }
-
-
